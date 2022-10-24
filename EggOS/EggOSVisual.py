@@ -3,6 +3,7 @@ from cmath import rect
 from datetime import datetime
 from multiprocessing.connection import wait
 from sqlite3 import Time
+import sys
 from time import sleep
 import pygame as py
 
@@ -51,7 +52,6 @@ while (X > -550):
     screen.blit(gaggleChicken, (X,Y))
     screen.blit(EggOStxt, (470,410))
     py.display.update()
-    print(str(X))
     clock.tick(60)
 
 mainMenu = True
@@ -89,15 +89,19 @@ screen.blit(calendarMonthText, (0,0))
 
 
 # this is a function just so it can be called when new data is gained
+running = True
 def updateMenu():
-    while True:
-       
        py.event.get()
        screen.blit(seasonBackground, (0,0))
        screen.blit(calendarBackground, (0,115))
        screen.blit(calendarMonthText, (250,135))
        py.display.update()
        py.time.delay(1000)
+
 updateMenu()
 
-
+while running == True:
+    for event in py.event.get():
+        if event.type == py.QUIT:
+            py.quit()
+            sys.exit()
