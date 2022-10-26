@@ -2,7 +2,7 @@ from datetime import datetime
 def main():
     tempSent = True
     time = (0, 0, 0, 1)
-    averages= [[][]]
+    averages= [[]*2]
     tempRequest = True
     averageTemp = 60
     tempTotal = 0
