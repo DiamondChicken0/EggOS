@@ -1,6 +1,8 @@
 import calendar
 from cmath import rect
 from datetime import datetime
+import math
+from msilib.schema import Class
 from multiprocessing.connection import wait
 from random import randint
 from sqlite3 import Time
@@ -104,6 +106,32 @@ dateFont = py.font.SysFont("Arial", 70)
 
 inUse = False
 selectedMonth = int(time.month)
+labelFont = py.font.SysFont("Bahnschrift", 20)
+class Day:
+    def __init__(self):
+        self.day = -1
+        self.temperature = -1
+        self.sun = -1
+        self.weekday = -1
+        self.rect = py.Rect((17,250), (103,75))
+        self.calendarText = labelFont.render("Test", 1, (0,0,0))
+
+    def change(self, d,t,s):
+        self.day = d
+        self.temperature = t
+        self.sun = s
+        self.weekday = calendar.weekday(time.year,selectedMonth, self.day)
+        self.rect = py.Rect(((115*((self.day-1)%7))+1,250+(math.floor(((self.day-1)/7)) * 75)), (105,65))
+        self.calendarText = labelFont.render(f"{self.day}", 1, (0,0,0))
+        self.calendarTextTemperature = labelFont.render(f"{self.temperature}° F", 1, (0,0,0))
+        sunPercent = (self.sun / 255)*100
+        sunPercent = int(sunPercent)
+        self.calendarTextSun = labelFont.render(f"Sun: {sunPercent}%", 1, (0,0,0))
+
+day0, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, day31, day32, day33, day34, day35, day36, day37, day38, day39, day40, day41 = Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day()
+
+listOfDays = [day0, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, day31, day32, day33, day34, day35, day36, day37, day38, day39, day40, day41]
+
 # this is a function just so it can be called when new data is gained and to update the screen
 def updateMenu(rotation, newImage):
     py.event.get()
@@ -135,12 +163,6 @@ def updateMenu(rotation, newImage):
     screen.blit(currentDay, (705, 40))
     screen.blit(newChicken, (800, 350))
 
-    firstDayOfTheWeek = calendar.weekday(time.year, selectedMonth, 1)
-    print(firstDayOfTheWeek)
-
-    
-
-
     thoughtBubble = py.image.load("thinking.png")
     thoughtBubble = py.transform.scale(thoughtBubble, (400,400))
 
@@ -157,6 +179,21 @@ def updateMenu(rotation, newImage):
 
     screen.blit(thoughtBubble, (875,0))
     screen.blit(emote, (975,40))
+
+    noOfDays = calendar.monthrange(2022, selectedMonth)[1]
+    for i in range(1, noOfDays):
+        print(i)
+        listOfDays[i-1].change(i,70,70)
+        if i % 3 == 0:
+            py.draw.rect(screen, (0, 0, 255), listOfDays[i-1].rect)
+        elif i % 3 == 1:
+            py.draw.rect(screen, (0, 255, 255), listOfDays[i-1].rect)
+        else:
+            py.draw.rect(screen, (255, 0, 0), listOfDays[i-1].rect)
+
+        screen.blit(listOfDays[i-1].calendarText, ((115*((i-1)%7))+10,250+(math.floor(((i-1)/7)) * 75)))
+        screen.blit(listOfDays[i-1].calendarTextTemperature, ((115*((i-1)%7))+10,270+(math.floor(((i-1)/7)) * 75)))
+        screen.blit(listOfDays[i-1].calendarTextSun, ((115*((i-1)%7))+10,290+(math.floor(((i-1)/7)) * 75)))
 
     py.display.update()
     return rotation
