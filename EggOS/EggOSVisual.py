@@ -107,13 +107,19 @@ dateFont = py.font.SysFont("Arial", 70)
 inUse = False
 selectedMonth = int(time.month)
 labelFont = py.font.SysFont("Bahnschrift", 20)
+
+def fixWeekends(org):
+    org = org + 1
+    if org >= 7:
+        return 0
+    return org
+
 class Day:
     def __init__(self):
         self.day = -1
         self.temperature = -1
         self.sun = -1
         self.weekday = -1
-        self.rect = py.Rect((17,250), (103,75))
         self.calendarText = labelFont.render("Test", 1, (0,0,0))
 
     def change(self, d,t,s):
@@ -121,7 +127,7 @@ class Day:
         self.temperature = t
         self.sun = s
         self.weekday = calendar.weekday(time.year,selectedMonth, self.day)
-        self.rect = py.Rect(((115*((self.day-1)%7))+1,250+(math.floor(((self.day-1)/7)) * 75)), (105,65))
+        print(calendar.weekday(time.year,selectedMonth, 1))
         self.calendarText = labelFont.render(f"{self.day}", 1, (0,0,0))
         self.calendarTextTemperature = labelFont.render(f"{self.temperature}° F", 1, (0,0,0))
         sunPercent = (self.sun / 255)*100
@@ -181,15 +187,10 @@ def updateMenu(rotation, newImage):
     screen.blit(emote, (975,40))
 
     noOfDays = calendar.monthrange(2022, selectedMonth)[1]
-    for i in range(1, noOfDays):
-        print(i)
+    for i in range(1, noOfDays+1):
+        calendar.firstweekday
+
         listOfDays[i-1].change(i,70,70)
-        if i % 3 == 0:
-            py.draw.rect(screen, (0, 0, 255), listOfDays[i-1].rect)
-        elif i % 3 == 1:
-            py.draw.rect(screen, (0, 255, 255), listOfDays[i-1].rect)
-        else:
-            py.draw.rect(screen, (255, 0, 0), listOfDays[i-1].rect)
 
         screen.blit(listOfDays[i-1].calendarText, ((115*((i-1)%7))+10,250+(math.floor(((i-1)/7)) * 75)))
         screen.blit(listOfDays[i-1].calendarTextTemperature, ((115*((i-1)%7))+10,270+(math.floor(((i-1)/7)) * 75)))
