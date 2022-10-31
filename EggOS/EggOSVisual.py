@@ -1,22 +1,30 @@
 import calendar
 from cmath import rect
 from datetime import datetime
-import math
-from msilib.schema import Class
 from multiprocessing.connection import wait
 from random import randint
-from sqlite3 import Time
+
 import sys
 import threading
 from time import sleep
 import pygame as py
-
+import Data
 from pygame.locals import *
 
 # just a lot of declaration, images have a lot of variables to mess with
 py.init()
 
-chickenCondition = "happy"
+dataThread = threading.Thread(target = Data.main)
+dataThread.start()
+
+rng = randint(0,2)
+print(rng)
+if rng == 0:
+    chickenCondtion = "happy"
+elif rng == 1:
+    chickenCondtion = "meh"
+elif rng == 2:
+    chickenCondtion = "angry"
 
 clock = py.time.Clock()
 screen = py.display.set_mode((1280, 720))
@@ -68,9 +76,11 @@ currentSeason = 'winter'
 
 if time.month >= 3 and time.month <= 5:
     seasonBackground = py.image.load("spring.jpg")
+    season = "spring"
 
 elif time.month >= 6 and time.month <= 8:
     seasonBackground = py.image.load("summer.jpg")
+    season = "summer"
 
 # if you are wondering, why the name leaffall.jpg?
 # the original names were autumn and fall
@@ -79,9 +89,11 @@ elif time.month >= 6 and time.month <= 8:
 
 elif time.month >= 9 and time.month <= 11:
     seasonBackground = py.image.load("leaffall.jpg")
+    season = "fall"
 
 else:
     seasonBackground = py.image.load("winter.jpg")
+    season = "winter"
 
 seasonBackground = py.transform.scale(seasonBackground, (1280, 720))
 
@@ -97,7 +109,7 @@ titleFont = py.font.SysFont("Bahnschrift", 100, bold=True)
 EggOStxt = titleFont.render("EggOS", 1, (247, 255, 82))
 screen.blit(EggOStxt, (470, 410))
 
-timeFont = py.font.SysFont("Arial", 90)
+timeFont = py.font.SysFont("Franklin Gothic", 90)
 currentTimeReadout = time.strftime("%H:%M:%S")
 currentTime = timeFont.render(currentTimeReadout, 1, (0, 0, 0))
 screen.blit(currentTime, (0, 0))
@@ -118,32 +130,32 @@ class Day:
     def __init__(self):
         self.day = -1
         self.temperature = -1
-        self.sun = -1
+        self.weather = -1
         self.weekday = -1
         self.calendarText = labelFont.render("Test", 1, (0,0,0))
 
-    def change(self, d,t,s):
+    def change(self, d,t,w):
         self.day = d
         self.temperature = t
-        self.sun = s
+        self.weather = w
         self.weekday = calendar.weekday(time.year,selectedMonth, self.day)
-        print(calendar.weekday(time.year,selectedMonth, 1))
+        self.weekday = fixWeekends(self.weekday)
         self.calendarText = labelFont.render(f"{self.day}", 1, (0,0,0))
         self.calendarTextTemperature = labelFont.render(f"{self.temperature}° F", 1, (0,0,0))
-        sunPercent = (self.sun / 255)*100
-        sunPercent = int(sunPercent)
-        self.calendarTextSun = labelFont.render(f"Sun: {sunPercent}%", 1, (0,0,0))
+        self.calendarTextSun = labelFont.render(f"{self.weather}", 1, (0,0,0))
 
 day0, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, day31, day32, day33, day34, day35, day36, day37, day38, day39, day40, day41 = Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day(),Day()
 
 listOfDays = [day0, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, day31, day32, day33, day34, day35, day36, day37, day38, day39, day40, day41]
 
 # this is a function just so it can be called when new data is gained and to update the screen
-def updateMenu(rotation, newImage):
+def updateMenu(rotation, CC):
+    chickenCondition = CC
     py.event.get()
     time = datetime.now()
     currentTimeReadout = time.strftime("%I:%M:%S %p")
     currentTime = timeFont.render(currentTimeReadout, 1, (0, 0, 0))
+
 
     chicken = py.image.load("chicken.png")
     chicken = py.transform.flip(chicken, True, False)
@@ -164,7 +176,7 @@ def updateMenu(rotation, newImage):
     screen.blit(calendarBackground, (0, 115))
     screen.blit(calendarMonthText, (250, 135))
     screen.blit(uiBar, (20, 4))
-    screen.blit(currentTime, (160, 6))
+    screen.blit(currentTime, (190, 30))
     screen.blit(currentMonth1, (620, 1))
     screen.blit(currentDay, (705, 40))
     screen.blit(newChicken, (800, 350))
@@ -176,32 +188,63 @@ def updateMenu(rotation, newImage):
         emote = py.image.load("happy_face.png")
     elif chickenCondition == "meh":
         emote = py.image.load("meh_spiral.png")
-    elif chickenCondition == "angry":
-        emote = py.image.load("angry_face2.png")
     else:
-        emote = py.image.load("egg,png")
+        emote = py.image.load("angry_face2.png")
 
     emote = py.transform.scale(emote, (200,200))
 
     screen.blit(thoughtBubble, (875,0))
-    screen.blit(emote, (975,40))
 
     noOfDays = calendar.monthrange(2022, selectedMonth)[1]
+    week = 0
+    Data.generateData(season)
     for i in range(1, noOfDays+1):
         calendar.firstweekday
+        weatherList = Data.pullWeather()
+        tempList = Data.pullTemps()
+        listOfDays[i-1].change(i,tempList[i],weatherList[i])
+        screen.blit(listOfDays[i-1].calendarText, ((115*((listOfDays[i-1].weekday)%7))+10,250+(week * 75)))
+        screen.blit(listOfDays[i-1].calendarTextTemperature, ((115*((listOfDays[i-1].weekday)%7))+10,270+(week * 75)))
+        screen.blit(listOfDays[i-1].calendarTextSun, ((115*((listOfDays[i-1].weekday)%7))+10,290+(week * 75)))
+        environmentPercent = 0
 
-        listOfDays[i-1].change(i,70,70)
+        #this metric is based of personal expirience
+        if listOfDays[i-1].temperature >= 60 and listOfDays[i-1].temperature <= 80:
+            environmentPercent = environmentPercent + 50
+        elif listOfDays[i-1].temperature >= 50 and listOfDays[i-1].temperature <= 90:
+            environmentPercent = environmentPercent + 25
+        if listOfDays[i-1].weather == "Sunny":
+            environmentPercent = environmentPercent + 50
+        elif listOfDays[i-1].weather == "Clear":
+            environmentPercent = environmentPercent + 30
+        elif listOfDays[i-1].weather == "Cloudy":
+            environmentPercent = environmentPercent + 30
+        elif listOfDays[i-1].weather == "Foggy":
+            environmentPercent = environmentPercent + 10
 
-        screen.blit(listOfDays[i-1].calendarText, ((115*((i-1)%7))+10,250+(math.floor(((i-1)/7)) * 75)))
-        screen.blit(listOfDays[i-1].calendarTextTemperature, ((115*((i-1)%7))+10,270+(math.floor(((i-1)/7)) * 75)))
-        screen.blit(listOfDays[i-1].calendarTextSun, ((115*((i-1)%7))+10,290+(math.floor(((i-1)/7)) * 75)))
+        if environmentPercent >= 65:
+            image = py.image.load("happy_thumbsup.png")
+            
+        elif environmentPercent <= 35:
+            image = py.image.load("angry_face.png")
+            
+        else:
+            image = py.image.load("meh_face.png")
+            
+        image = py.transform.scale(image,(30,30))
+        screen.blit(image, ((115*((listOfDays[i-1].weekday)%7))+60,255+(week * 75)))
+        screen.blit(emote, (975,40))
+
+        if listOfDays[i-1].weekday == 6:
+            week = week + 1
+
 
     py.display.update()
     return rotation
 
 
 chickenRotation = 0
-chickenRotation = updateMenu(chickenRotation, False)
+chickenRotation = updateMenu(chickenRotation,chickenCondtion)
 
 while running == True:
     for event in py.event.get():
@@ -209,4 +252,4 @@ while running == True:
             py.quit()
             sys.exit()
 
-    chickenRotation = updateMenu(chickenRotation, False)
+    chickenRotation = updateMenu(chickenRotation, chickenCondtion)

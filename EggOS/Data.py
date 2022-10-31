@@ -1,7 +1,10 @@
 from datetime import time, date, datetime
+from random import randint
 from re import T
 import time
 tempList = []
+averageTemps = []
+weatherList = []
 def main():
     tempSent = True
     weatherSent = True
@@ -57,7 +60,40 @@ def main():
             weatherList.append(weather)
             tempList.clear()
         test = int(input())
-            
-        
-main()
-    
+
+def generateData(condition):
+    for i in range(40):
+        if condition == "summer":
+            averageTemps.append(randint(65,100))
+
+        elif condition == "winter":
+            averageTemps.append(randint(0,40))
+
+        elif condition == "fall":
+            averageTemps.append(randint(30,60))
+
+        elif condition == "spring":
+            averageTemps.append(randint(50,70))
+
+    for j in range(40): 
+        weatherOption = randint(-5,3)
+        if weatherOption <= 0:
+            if averageTemps[j] <= 20:
+                weatherList.append("Clear")
+            else:
+                weatherList.append("Sunny")
+        elif weatherOption == 1:
+            weatherList.append("Cloudy")
+        elif weatherOption == 2:
+            if averageTemps[j] <= 32:
+                weatherList.append("Snowing")
+            else:
+                weatherList.append("Raining")
+        elif weatherOption == 3:
+            weatherList.append("Foggy")
+
+def pullWeather():
+    return weatherList
+
+def pullTemps():
+    return averageTemps
