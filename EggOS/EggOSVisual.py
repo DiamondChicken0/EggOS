@@ -14,8 +14,8 @@ from pygame.locals import *
 # just a lot of declaration, images have a lot of variables to mess with
 py.init()
 
-dataThread = threading.Thread(target = Data.main)
-dataThread.start()
+#dataThread = threading.Thread(target = Data.main)
+#dataThread.start()
 
 rng = randint(0,2)
 print(rng)
