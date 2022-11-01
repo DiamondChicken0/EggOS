@@ -2,6 +2,7 @@ import calendar
 from cmath import rect
 from datetime import datetime
 from multiprocessing.connection import wait
+import os
 from random import randint
 
 import sys
@@ -26,6 +27,8 @@ elif rng == 1:
 elif rng == 2:
     chickenCondtion = "angry"
 
+fileStart = os.path.dirname(__file__)
+
 clock = py.time.Clock()
 screen = py.display.set_mode((1280, 720))
 py.display.set_caption("EggOS")
@@ -35,16 +38,16 @@ running = True
 background = py.Rect((0, 0), (1280, 720))
 py.draw.rect(screen, (255, 255, 255), background)
 
-grassBackground = py.image.load("grass.jpg")
+grassBackground = py.image.load(f"{fileStart}/grass.jpg")
 grassBackground = py.transform.scale(grassBackground, (1280, 720))
 screen.blit(grassBackground, (0, 0))
 
-gaggleChicken = py.image.load("gaggleofchickens.png")
+gaggleChicken = py.image.load(f"{fileStart}/gaggleofchickens.png")
 gaggleChicken = py.transform.scale(gaggleChicken, (420, 325))
 screen.blit(gaggleChicken, (440, 100))
 
 titleFont = py.font.SysFont("Bahnschrift", 100, bold=True)
-EggOStxt = py.image.load("EggOS logo.png")
+EggOStxt = py.image.load(f"{fileStart}/EggOS logo.png")
 screen.blit(EggOStxt, (470, 410))
 
 X = 440
@@ -75,11 +78,11 @@ currentSeason = 'winter'
 # checks the month and assigns a season so the background is seasonal
 
 if time.month >= 3 and time.month <= 5:
-    seasonBackground = py.image.load("spring.jpg")
+    seasonBackground = py.image.load(f"{fileStart}/spring.jpg")
     season = "spring"
 
 elif time.month >= 6 and time.month <= 8:
-    seasonBackground = py.image.load("summer.jpg")
+    seasonBackground = py.image.load(f"{fileStart}/summer.jpg")
     season = "summer"
 
 # if you are wondering, why the name leaffall.jpg?
@@ -88,22 +91,22 @@ elif time.month >= 6 and time.month <= 8:
 # just accept it
 
 elif time.month >= 9 and time.month <= 11:
-    seasonBackground = py.image.load("leaffall.jpg")
+    seasonBackground = py.image.load(f"{fileStart}/leaffall.jpg")
     season = "fall"
 
 else:
-    seasonBackground = py.image.load("winter.jpg")
+    seasonBackground = py.image.load(f"{fileStart}/winter.jpg")
     season = "winter"
 
 seasonBackground = py.transform.scale(seasonBackground, (1280, 720))
 
-calendarBackground = py.image.load("Calendar.png")
+calendarBackground = py.image.load(f"{fileStart}/Calendar.png")
 
 currentMonth = calendar.month_name[time.month]
 monthFont = py.font.SysFont("Aharoni", 100, bold=True)
 calendarMonthText = monthFont.render(currentMonth, 1, (0, 0, 0))
 
-uiBar = py.image.load("UI Bar.png")
+uiBar = py.image.load(f"{fileStart}/UI Bar.png")
 
 titleFont = py.font.SysFont("Bahnschrift", 100, bold=True)
 EggOStxt = titleFont.render("EggOS", 1, (247, 255, 82))
@@ -157,7 +160,7 @@ def updateMenu(rotation, CC):
     currentTime = timeFont.render(currentTimeReadout, 1, (0, 0, 0))
 
 
-    chicken = py.image.load("chicken.png")
+    chicken = py.image.load(f"{fileStart}/chicken.png")
     chicken = py.transform.flip(chicken, True, False)
     chicken = py.transform.scale(chicken, (700, 500))
     newChicken = py.transform.rotate(chicken, rotation)
@@ -181,15 +184,15 @@ def updateMenu(rotation, CC):
     screen.blit(currentDay, (705, 40))
     screen.blit(newChicken, (800, 350))
 
-    thoughtBubble = py.image.load("thinking.png")
+    thoughtBubble = py.image.load(f"{fileStart}/thinking.png")
     thoughtBubble = py.transform.scale(thoughtBubble, (400,400))
 
     if chickenCondition == "happy":
-        emote = py.image.load("happy_face.png")
+        emote = py.image.load(f"{fileStart}/happy_face.png")
     elif chickenCondition == "meh":
-        emote = py.image.load("meh_spiral.png")
+        emote = py.image.load(f"{fileStart}/meh_spiral.png")
     else:
-        emote = py.image.load("angry_face2.png")
+        emote = py.image.load(f"{fileStart}/angry_face2.png")
 
     emote = py.transform.scale(emote, (200,200))
 
@@ -223,13 +226,13 @@ def updateMenu(rotation, CC):
             environmentPercent = environmentPercent + 10
 
         if environmentPercent >= 65:
-            image = py.image.load("happy_thumbsup.png")
+            image = py.image.load(f"{fileStart}/happy_thumbsup.png")
             
         elif environmentPercent <= 35:
-            image = py.image.load("angry_face.png")
+            image = py.image.load(f"{fileStart}/angry_face.png")
             
         else:
-            image = py.image.load("meh_face.png")
+            image = py.image.load(f"{fileStart}/meh_face.png")
             
         image = py.transform.scale(image,(30,30))
         screen.blit(image, ((115*((listOfDays[i-1].weekday)%7))+60,255+(week * 75)))
