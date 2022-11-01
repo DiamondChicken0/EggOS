@@ -11,5 +11,4 @@ it should update the calendar in a appropiate way.
 
 All imagery is either under the Pixabay License which allows unaltered non commericial use, or created in house by us.
 
-The main .py file is the EggOSVisual.py file, please run with an IDE such as Visual Studio Code or 20XX with Python 3.10 installed.
-running the .py directly causes an error relating relative file paths.
+The main .py file is the EggOSVisual.py file, please run that .py.
