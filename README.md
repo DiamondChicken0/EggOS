@@ -11,3 +11,4 @@ it should update the calendar in a appropiate way.
 
 All imagery is either under the Pixabay License which allows unaltered non commericial use, or created in house by us.
 
+The main .py file is the EggOSVisual.py file
